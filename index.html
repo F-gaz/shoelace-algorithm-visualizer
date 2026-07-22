@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive Shoelace Algorithm visualizer for calculating polygon areas in 2D and 3D with real-time rendering and step-by-step formula breakdown.">
+    <title>Shoelace Algorithm Visualizer — 2D &amp; 3D</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <header id="app-header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <polygon points="20,4 36,14 36,30 20,36 4,30 4,14" stroke="url(#grad1)" stroke-width="2" fill="none" opacity="0.6"/>
+                        <polygon points="20,8 32,16 32,28 20,32 8,28 8,16" stroke="url(#grad1)" stroke-width="1.5" fill="url(#grad2)" opacity="0.3"/>
+                        <circle cx="20" cy="4" r="2.5" fill="#a78bfa"/>
+                        <circle cx="36" cy="14" r="2.5" fill="#818cf8"/>
+                        <circle cx="36" cy="30" r="2.5" fill="#6366f1"/>
+                        <circle cx="20" cy="36" r="2.5" fill="#818cf8"/>
+                        <circle cx="4" cy="30" r="2.5" fill="#a78bfa"/>
+                        <circle cx="4" cy="14" r="2.5" fill="#c4b5fd"/>
+                        <defs>
+                            <linearGradient id="grad1" x1="0" y1="0" x2="40" y2="40">
+                                <stop offset="0%" stop-color="#a78bfa"/>
+                                <stop offset="100%" stop-color="#6366f1"/>
+                            </linearGradient>
+                            <linearGradient id="grad2" x1="0" y1="0" x2="40" y2="40">
+                                <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.2"/>
+                                <stop offset="100%" stop-color="#6366f1" stop-opacity="0.1"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>Shoelace Algorithm</h1>
+                    <p class="subtitle">Interactive Polygon Area Calculator</p>
+                </div>
+            </div>
+            <div class="mode-toggle mode-toggle-3" id="mode-toggle">
+                <button class="mode-btn active" data-mode="2d" id="btn-2d">
+                    <span class="mode-icon">◻</span> 2D
+                </button>
+                <button class="mode-btn" data-mode="3d" id="btn-3d">
+                    <span class="mode-icon">◇</span> 3D
+                </button>
+                <button class="mode-btn" data-mode="newtheory" id="btn-nt">
+                    <span class="mode-icon">🌾</span> ทฤษฎีใหม่
+                </button>
+                <div class="toggle-slider" id="toggle-slider"></div>
+            </div>
+        </div>
+    </header>
+
+    <main id="app-main">
+        <aside class="panel input-panel" id="input-panel">
+            <div class="panel-header">
+                <h2>Coordinates</h2>
+                <span class="badge" id="point-count">0 points</span>
+            </div>
+
+            <div class="coord-input-area" id="coord-input-area">
+                <div class="input-row-header">
+                    <span class="col-label">#</span>
+                    <span class="col-label">X</span>
+                    <span class="col-label">Y</span>
+                    <span class="col-label z-col" id="z-header">Z</span>
+                    <span class="col-label action-col"></span>
+                </div>
+                <div class="coord-rows" id="coord-rows">
+                    <!-- Dynamically generated -->
+                </div>
+            </div>
+
+            <div class="input-actions">
+                <button class="btn btn-primary" id="btn-add-point">
+                    <span class="btn-icon">+</span> Add Point
+                </button>
+                <button class="btn btn-secondary" id="btn-clear-all">
+                    <span class="btn-icon">✕</span> Clear
+                </button>
+            </div>
+
+            <div class="presets-section">
+                <h3>Quick Presets</h3>
+                <div class="preset-grid" id="preset-grid">
+                    <!-- Dynamically generated -->
+                </div>
+            </div>
+
+            <button class="btn btn-accent btn-calculate" id="btn-calculate">
+                <span class="btn-icon">▶</span> Calculate Area
+            </button>
+        </aside>
+
+        <aside class="panel input-panel hidden" id="nt-input-panel">
+            <div class="panel-header">
+                <h2>🌾 ทฤษฎีใหม่</h2>
+                <span class="badge nt-pct-badge" id="nt-total-pct">100%</span>
+            </div>
+
+            <!-- Land Vertices -->
+            <div class="nt-section">
+                <h3>📐 พิกัดที่ดิน (4 จุด)</h3>
+                <select id="nt-land-preset" class="coord-input" style="text-align: center; text-align-last: center; margin-bottom: 12px; width: 100%;">
+                    <option value="">-- เลือกรูปแปลงที่ดิน --</option>
+                </select>
+                <div class="nt-vertex-grid">
+                    <div class="nt-vertex-header">
+                        <span>#</span><span>X</span><span>Y</span>
+                    </div>
+                    <div class="nt-vertex-row">
+                        <span class="nt-vertex-idx">1</span>
+                        <input type="number" id="nt-vx-0" value="0" step="any">
+                        <input type="number" id="nt-vy-0" value="0" step="any">
+                    </div>
+                    <div class="nt-vertex-row">
+                        <span class="nt-vertex-idx">2</span>
+                        <input type="number" id="nt-vx-1" value="10" step="any">
+                        <input type="number" id="nt-vy-1" value="0" step="any">
+                    </div>
+                    <div class="nt-vertex-row">
+                        <span class="nt-vertex-idx">3</span>
+                        <input type="number" id="nt-vx-2" value="10" step="any">
+                        <input type="number" id="nt-vy-2" value="8" step="any">
+                    </div>
+                    <div class="nt-vertex-row">
+                        <span class="nt-vertex-idx">4</span>
+                        <input type="number" id="nt-vx-3" value="0" step="any">
+                        <input type="number" id="nt-vy-3" value="8" step="any">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slope Settings -->
+            <div class="nt-section">
+                <h3>⛰️ ความลาดเอียง</h3>
+                <div class="nt-slope-row">
+                    <label>มุม (°) <span id="nt-slope-angle-val" style="color: var(--accent-violet); font-weight: 600;">5°</span></label>
+                    <input type="number" id="nt-slope-angle" value="5" min="0" max="89" step="0.5">
+                </div>
+                <div class="nt-slope-row">
+                    <label>ทิศทาง</label>
+                    <select id="nt-slope-dir">
+                        <option value="W2E">ตะวันตก → ตะวันออก</option>
+                        <option value="E2W">ตะวันออก → ตะวันตก</option>
+                        <option value="N2S">เหนือ → ใต้</option>
+                        <option value="S2N">ใต้ → เหนือ</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Zone List -->
+            <div class="nt-section nt-zone-section">
+                <h3>🗺️ โซนการใช้ที่ดิน</h3>
+                <div class="nt-zone-list-header">
+                    <span>สูง ↑</span><span></span><span></span><span></span><span>ต่ำ ↓</span>
+                </div>
+                <div class="nt-zone-list" id="nt-zone-list">
+                    <!-- Dynamic zone rows rendered by newtheory.js -->
+                </div>
+                <button class="btn btn-primary nt-add-zone-btn" id="nt-add-zone-btn">
+                    <span class="btn-icon">+</span> เพิ่มโซน
+                </button>
+                <div class="nt-pct-bar" id="nt-pct-bar">
+                    <!-- Segmented percentage bar rendered by newtheory.js -->
+                </div>
+                <div class="nt-pct-warning hidden" id="nt-pct-warning">
+                    ⚠️ รวมไม่ครบ 100%
+                </div>
+            </div>
+
+            <!-- Presets -->
+            <div class="nt-section">
+                <h3>⚡ Presets</h3>
+                <div class="preset-grid" id="nt-preset-grid">
+                    <!-- Rendered by newtheory.js -->
+                </div>
+            </div>
+
+            <button class="btn btn-accent btn-calculate" id="nt-calculate">
+                <span class="btn-icon">▶</span> คำนวณแบ่งโซน
+            </button>
+        </aside>
+
+        <section class="panel viz-panel" id="viz-panel">
+            <div class="viz-toolbar">
+                <div class="viz-info">
+                    <span class="viz-label" id="viz-label">2D Polygon View</span>
+                </div>
+                <div class="viz-controls">
+                    <div class="nt-view-toggle hidden" id="nt-view-toggle">
+                        <button class="viz-btn active" id="nt-btn-view-2d" title="2D View">2D</button>
+                        <button class="viz-btn" id="nt-btn-view-3d" title="3D View">3D</button>
+                    </div>
+                    <span class="viz-divider hidden" id="nt-viz-divider">|</span>
+                    <button class="viz-btn" id="btn-reset-view" title="Reset View">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 3a5 5 0 0 0-4.546 2.914.5.5 0 0 1-.908-.418A6 6 0 1 1 2 8a.5.5 0 0 1 1 0 5 5 0 1 0 5-5z"/><path d="M8 1.5l-3 3 3 3V1.5z"/></svg>
+                    </button>
+                    <button class="viz-btn" id="btn-toggle-grid" title="Toggle Grid">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.5A1.5 1.5 0 0 1 1.5 0h13A1.5 1.5 0 0 1 16 1.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13zM1.5 1a.5.5 0 0 0-.5.5V5h4V1H1.5zM5 6H1v4h4V6zm1 4h4V6H6v4zm-1 1H1v3.5a.5.5 0 0 0 .5.5H5v-4zm1 0v4h4v-4H6zm5 0v4h3.5a.5.5 0 0 0 .5-.5V11h-4zm0-1h4V6h-4v4zm0-5h4V1.5a.5.5 0 0 0-.5-.5H11v4zm-1 0V1H6v4h4z"/></svg>
+                    </button>
+                    <button class="viz-btn" id="btn-toggle-labels" title="Toggle Labels">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M12.258 1h-8.51l-.083 2.264h.49c.078-1.034.11-1.218.45-1.426.2-.12.527-.138.896-.138h1.122v7.794c0 .474-.034.634-.476.753l-.532.138v.354h3.77v-.354l-.532-.138c-.442-.12-.476-.28-.476-.753V1.7h1.122c.37 0 .696.018.896.138.34.208.372.392.45 1.426h.49L12.258 1z"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="viz-container" id="viz-container">
+                <canvas id="canvas-2d"></canvas>
+                <div id="three-container" class="hidden"></div>
+                <div class="viz-overlay" id="viz-overlay">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg viewBox="0 0 80 80" fill="none">
+                                <polygon points="40,10 70,25 70,55 40,70 10,55 10,25" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.4"/>
+                                <circle cx="40" cy="10" r="3" fill="currentColor" opacity="0.3"/>
+                                <circle cx="70" cy="25" r="3" fill="currentColor" opacity="0.3"/>
+                                <circle cx="70" cy="55" r="3" fill="currentColor" opacity="0.3"/>
+                                <circle cx="40" cy="70" r="3" fill="currentColor" opacity="0.3"/>
+                                <circle cx="10" cy="55" r="3" fill="currentColor" opacity="0.3"/>
+                                <circle cx="10" cy="25" r="3" fill="currentColor" opacity="0.3"/>
+                            </svg>
+                        </div>
+                        <p>Add at least <strong>3 points</strong> to visualize a polygon</p>
+                        <p class="hint">Or pick a preset to get started</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <aside class="panel result-panel" id="result-panel">
+            <div class="panel-header">
+                <h2>Results</h2>
+            </div>
+
+            <div class="result-area-display" id="result-area-display">
+                <div class="area-label">Calculated Area</div>
+                <div class="area-value" id="area-value">—</div>
+                <div class="area-unit">square units</div>
+            </div>
+
+            <div class="formula-section" id="formula-section">
+                <h3>Shoelace Formula</h3>
+                <div class="formula-card" id="formula-card">
+                    <div class="formula-tex">
+                        A = ½ |Σ (x<sub>i</sub> · y<sub>i+1</sub> − x<sub>i+1</sub> · y<sub>i</sub>)|
+                    </div>
+                </div>
+            </div>
+
+            <div class="steps-section" id="steps-section">
+                <h3>Step-by-Step</h3>
+                <div class="steps-container" id="steps-container">
+                    <div class="step-placeholder">
+                        Calculate to see step-by-step breakdown
+                    </div>
+                </div>
+            </div>
+
+            <div class="matrix-section" id="matrix-section">
+                <h3>Shoelace Matrix</h3>
+                <div class="matrix-container" id="matrix-container">
+                    <div class="step-placeholder">
+                        Calculate to see the matrix
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <aside class="panel result-panel hidden" id="nt-result-panel">
+            <div class="panel-header">
+                <h2>ผลลัพธ์</h2>
+            </div>
+
+            <div class="result-area-display">
+                <div class="area-label">พื้นที่รวม</div>
+                <div class="area-value" id="nt-total-area">—</div>
+                <div class="area-unit">ตารางหน่วย</div>
+            </div>
+
+            <div class="nt-zone-results" id="nt-zone-results">
+                <div class="step-placeholder">คำนวณเพื่อดูผลลัพธ์แต่ละโซน</div>
+            </div>
+
+            <div class="nt-section">
+                <h3>สมการขอบเขต</h3>
+                <div id="nt-equations" class="nt-info-card">
+                    <div class="step-placeholder">คำนวณเพื่อดูสมการ</div>
+                </div>
+            </div>
+
+            <div class="nt-section">
+                <h3>พิกัด 3D (x, y, z)</h3>
+                <div id="nt-3d-coords" class="nt-info-card">
+                    <div class="step-placeholder">คำนวณเพื่อดูพิกัด 3 มิติ</div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="app.js"></script>
+    <script src="newtheory.js"></script>
+</body>
+</html>
